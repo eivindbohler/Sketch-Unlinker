@@ -2,7 +2,7 @@
 
 Sketch plugin that lets you unlink all layers in an artboard from either shared symbols, styles or text styles, en masse.
 
-![Example screenshot](https://github.com/eivindbohler/Sketch-Unlinker/screenshot01.png)
+![Example screenshot](https://github.com/eivindbohler/Sketch-Unlinker/blob/master/screenshot01.png)
 
 ## Installation
 
