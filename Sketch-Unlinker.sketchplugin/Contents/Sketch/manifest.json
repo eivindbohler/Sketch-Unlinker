@@ -1,0 +1,25 @@
+{
+  "name" : "Sketch Unlinker",
+  "description" : "Sketch plugin that lets you unlink selected layers and groups from either shared symbols, styles or text styles, en masse.",
+  "author" : "Eivind Bohler",
+  "authorEmail" : "eivind.bohler@gmail.com",
+  "homepage": "http://github.com/eivindbohler/Sketch-Unlinker",
+  "version" : 1.0,
+  "identifier" : "com.eivindbohler.sketch-unlinker",
+  "compatibleVersion": 3.3,
+  "commands" : [
+    {
+      "script" : "unlinker.cocoascript",
+      "handler" : "unlinker",
+      "shortcut" : "cmd shift u",
+      "name" : "Unlink symbols and styles",
+      "identifier" : "unlinker"
+    },
+  ],
+  "menu": {
+    "isRoot": true,
+    "items": [
+      "unlinker",
+    ],
+  }
+}

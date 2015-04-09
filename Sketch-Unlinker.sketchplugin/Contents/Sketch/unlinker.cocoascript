@@ -1,0 +1,51 @@
+@import "helpers.cocoascript"
+
+var unlinker = function(context) {
+
+  var doc = context.document
+  var selection = context.selection
+
+  if (selection.count() == 0) {
+    doc.showMessage("Please select one or more items.")
+    return
+  }
+
+  var response = helpers.displayUnlinkSelection()
+
+  var shouldCancel = response[0] == 1001
+  if (shouldCancel) {
+    return
+  }
+
+  var stylesToRemove = response[1]
+  var includeGroupElements = stylesToRemove[3]
+
+  var selectedStyles = new Object()
+  helpers.getStylesForSelection(selection, includeGroupElements, selectedStyles)
+
+  var infoText = "Removed "
+  var removalText = ""
+
+  if (stylesToRemove[0] == 1) {
+    var sharedSymbols = doc.documentData().layerSymbols()
+    var numberOfRemovedSymbols = helpers.removeSharedStyles(sharedSymbols, selectedStyles)
+    removalText += numberOfRemovedSymbols + " symbol" + (numberOfRemovedSymbols != 1 ? "s" : "")
+  }
+
+  if (stylesToRemove[1] == 1) {
+    var sharedStyles = doc.documentData().layerStyles()
+    var numberOfRemovedStyles = helpers.removeSharedStyles(sharedStyles, selectedStyles)
+    removalText += (removalText.length > 0 ? ", " : "") + numberOfRemovedStyles + " style" + (numberOfRemovedStyles != 1 ? "s" : "")
+  }
+
+  if (stylesToRemove[2] == 1) {
+    var sharedTextStyles = doc.documentData().layerTextStyles()
+    var numberOfRemovedTextStyles = helpers.removeSharedStyles(sharedTextStyles, selectedStyles)
+    removalText += (removalText.length > 0 ? ", " : "") + numberOfRemovedTextStyles + " text style" + (numberOfRemovedTextStyles != 1 ? "s" : "")
+  }
+
+  infoText += removalText + "."
+
+  log(infoText)
+  doc.showMessage(infoText)
+};
