@@ -4,6 +4,10 @@ Sketch plugin that lets you unlink selected layers and groups from either shared
 
 ![Example screenshot](https://github.com/eivindbohler/Sketch-Unlinker/blob/master/screenshot02.png)
 
+## Requirements
+
+Sketch 3.3
+
 ## Installation
 
 * [Download the zip file.](https://github.com/eivindbohler/Sketch-Unlinker/archive/master.zip)
