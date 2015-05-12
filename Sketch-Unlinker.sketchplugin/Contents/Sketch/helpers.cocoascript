@@ -50,12 +50,10 @@ var helpers = {
 
     return [responseCode, buttonStates]
   },
-  "removeSharedStyles": function(styles, selectedStyles) {
+  "removeSharedStyles": function(styles, selectedStyles, iterations) {
     var removedCount = 0
 
-    var numberOfSelectedStyles = Object.keys(selectedStyles).length
-
-    for (var i = 0; i < numberOfSelectedStyles; i++) {
+    for (var i = 0; i < iterations; i++) {
       for (var j = 0; j < styles.numberOfSharedObjects(); j++) {
         var sharedObject = styles.sharedObjectAtIndex(j)
         for (var k = 0; k < sharedObject.instances().count(); k++) {
@@ -72,19 +70,27 @@ var helpers = {
 
     return removedCount
   },
-  "getStylesForSelection": function(selection, includeGroupElements, selectedStyles) {
-    for (var i = 0; i < selection.count(); i++) {
-      var item = selection[i] || selection.objectAtIndex(i)
-      var isArtboard = item.isKindOfClass(MSArtboardGroup.class())
-      var isGroup = item.isKindOfClass(MSLayerGroup.class())
+  "recursivelyGetStylesForItem": function(item, includeGroupElements, selectedStyles, depth, maxDepth) {
+    depth["number"] = depth["number"] + 1
+    if (depth["number"] > maxDepth["number"]) {
+      maxDepth["number"] = depth["number"]
+    }
 
-      if (isArtboard || (isGroup && includeGroupElements)) {
-        helpers.getStylesForSelection(item.layers(), includeGroupElements, selectedStyles)
+    if (item.isKindOfClass(NSArray.class())) { // NSArray
+      for (var i = 0; i < item.count(); i++) {
+        var subItem = item.objectAtIndex(i)
+        helpers.recursivelyGetStylesForItem(subItem, includeGroupElements, selectedStyles, depth, maxDepth)
       }
-      if (item.isKindOfClass(MSLayer.class())) {
-        helpers.getStylesForLayer(item, selectedStyles)
+    } else if (item.respondsToSelector("layers") && (item.isKindOfClass(MSArtboardGroup.class()) || includeGroupElements)) { // Layer with children
+      var layers = item.layers()
+      for (var i = 0; i < layers.count(); i++) {
+        var layer = layers.objectAtIndex(i)
+        helpers.recursivelyGetStylesForItem(layer, includeGroupElements, selectedStyles, depth, maxDepth)
       }
     }
+    helpers.getStylesForLayer(item, selectedStyles)
+
+    depth["number"] = depth["number"] - 1
   },
   "getStylesForLayer": function(layer, selectedStyles) {
     if (layer.isKindOfClass(MSLayerGroup.class())) { // If the layer is a symbol

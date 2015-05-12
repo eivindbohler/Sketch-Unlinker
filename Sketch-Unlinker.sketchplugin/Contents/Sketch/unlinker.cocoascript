@@ -20,31 +20,44 @@ var unlinker = function(context) {
   var stylesToRemove = response[1]
   var includeGroupElements = stylesToRemove[3]
 
-  var selectedStyles = new Object()
-  helpers.getStylesForSelection(selection, includeGroupElements, selectedStyles)
+  var shouldRemoveSymbols    = stylesToRemove[0] == 1
+  var shouldRemoveStyles     = stylesToRemove[1] == 1
+  var shouldRemoveTextStyles = stylesToRemove[2] == 1
 
-  var infoText = "Removed "
+  var selectedStyles = new Object()
+  var depth          = {"number": 0}
+  var maxDepth       = {"number": 0}
+
+  var infoText    = ""
   var removalText = ""
 
-  if (stylesToRemove[0] == 1) {
-    var sharedSymbols = doc.documentData().layerSymbols()
-    var numberOfRemovedSymbols = helpers.removeSharedStyles(sharedSymbols, selectedStyles)
-    removalText += numberOfRemovedSymbols + " symbol" + (numberOfRemovedSymbols != 1 ? "s" : "")
-  }
+  if (shouldRemoveSymbols || shouldRemoveStyles || shouldRemoveTextStyles) {
+    helpers.recursivelyGetStylesForItem(selection, includeGroupElements, selectedStyles, depth, maxDepth)
 
-  if (stylesToRemove[1] == 1) {
-    var sharedStyles = doc.documentData().layerStyles()
-    var numberOfRemovedStyles = helpers.removeSharedStyles(sharedStyles, selectedStyles)
-    removalText += (removalText.length > 0 ? ", " : "") + numberOfRemovedStyles + " style" + (numberOfRemovedStyles != 1 ? "s" : "")
-  }
+    infoText = "Removed "
 
-  if (stylesToRemove[2] == 1) {
-    var sharedTextStyles = doc.documentData().layerTextStyles()
-    var numberOfRemovedTextStyles = helpers.removeSharedStyles(sharedTextStyles, selectedStyles)
-    removalText += (removalText.length > 0 ? ", " : "") + numberOfRemovedTextStyles + " text style" + (numberOfRemovedTextStyles != 1 ? "s" : "")
-  }
+    if (shouldRemoveSymbols) {
+      var sharedSymbols = doc.documentData().layerSymbols()
+      var numberOfRemovedSymbols = helpers.removeSharedStyles(sharedSymbols, selectedStyles, maxDepth["number"])
+      removalText += numberOfRemovedSymbols + " symbol" + (numberOfRemovedSymbols != 1 ? "s" : "")
+    }
 
-  infoText += removalText + "."
+    if (shouldRemoveStyles) {
+      var sharedStyles = doc.documentData().layerStyles()
+      var numberOfRemovedStyles = helpers.removeSharedStyles(sharedStyles, selectedStyles, maxDepth["number"])
+      removalText += (removalText.length > 0 ? ", " : "") + numberOfRemovedStyles + " style" + (numberOfRemovedStyles != 1 ? "s" : "")
+    }
+
+    if (shouldRemoveTextStyles) {
+      var sharedTextStyles = doc.documentData().layerTextStyles()
+      var numberOfRemovedTextStyles = helpers.removeSharedStyles(sharedTextStyles, selectedStyles, maxDepth["number"])
+      removalText += (removalText.length > 0 ? ", " : "") + numberOfRemovedTextStyles + " text style" + (numberOfRemovedTextStyles != 1 ? "s" : "")
+    }
+
+    infoText += removalText + "."
+  } else {
+    infoText = "See you changed your mind there, mate. Better luck next time! :)"
+  }
 
   log(infoText)
   doc.showMessage(infoText)
